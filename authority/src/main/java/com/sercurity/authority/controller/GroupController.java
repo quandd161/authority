@@ -1,36 +1,39 @@
 package com.sercurity.authority.controller;
 
+import com.sercurity.authority.dto.GroupDto;
 import com.sercurity.authority.model.Group;
 import com.sercurity.authority.repository.GroupRepository;
+import com.sercurity.authority.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
-    @Autowired
-    private GroupRepository groupRepo;
+    private final GroupService groupService;
+    public GroupController(GroupService groupService) { this.groupService = groupService; }
 
+    @PreAuthorize("hasAuthority('GROUP_MANAGE')")
     @GetMapping
-    public List<Group> list() {
-        return groupRepo.findAll();
+    public List<GroupDto> getAll() {
+        return groupService.getAll().stream().map(GroupDto::fromEntity).toList();
     }
 
+    @PreAuthorize("hasAuthority('GROUP_MANAGE')")
     @PostMapping
-    public Group create(@RequestBody Group group) {
-        return groupRepo.save(group);
+    public GroupDto create(@RequestBody GroupDto dto) {
+        Group g = new Group();
+        g.setName(dto.getName());
+        return GroupDto.fromEntity(groupService.create(g));
     }
 
-    @PutMapping("/{id}")
-    public Group update(@PathVariable Long id, @RequestBody Group group) {
-        group.setId(id);
-        return groupRepo.save(group);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        groupRepo.deleteById(id);
+    @PreAuthorize("hasAuthority('GROUP_MANAGE')")
+    @PostMapping("/{id}/roles")
+    public void assignRoles(@PathVariable Long id, @RequestBody Set<Long> roleIds) {
+        groupService.assignRoles(id, roleIds);
     }
 }

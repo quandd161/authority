@@ -42,9 +42,4 @@ public class HomeController {
         return "Đây là dữ liệu được bảo vệ! Bạn đã xác thực thành công.";
     }
 
-//    @GetMapping("/profile")
-//    public String profile(Model model, @AuthenticationPrincipal OidcUser principal) {
-//        model.addAttribute("user", principal);
-//        return "profile";
-//    }
 }

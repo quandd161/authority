@@ -1,36 +1,39 @@
 package com.sercurity.authority.controller;
 
+import com.sercurity.authority.dto.RoleDto;
 import com.sercurity.authority.model.Role;
 import com.sercurity.authority.repository.RoleRepository;
+import com.sercurity.authority.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/roles")
 public class RoleController {
-    @Autowired
-    private RoleRepository roleRepo;
+    private final RoleService roleService;
+    public RoleController(RoleService roleService) { this.roleService = roleService; }
 
+    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     @GetMapping
-    public List<Role> list() {
-        return roleRepo.findAll();
+    public List<RoleDto> getAll() {
+        return roleService.getAll().stream().map(RoleDto::fromEntity).toList();
     }
 
+    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     @PostMapping
-    public Role create(@RequestBody Role role) {
-        return roleRepo.save(role);
+    public RoleDto create(@RequestBody RoleDto dto) {
+        Role r = new Role();
+        r.setName(dto.getName());
+        return RoleDto.fromEntity(roleService.create(r));
     }
 
-    @PutMapping("/{id}")
-    public Role update(@PathVariable Long id, @RequestBody Role role) {
-        role.setId(id);
-        return roleRepo.save(role);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        roleRepo.deleteById(id);
+    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PostMapping("/{id}/authorities")
+    public void assignAuthorities(@PathVariable Long id, @RequestBody Set<Long> authorityIds) {
+        roleService.assignAuthorities(id, authorityIds);
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -34,12 +36,17 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/register", "/login", "/oauth2/**").permitAll()
+                        .requestMatchers("/users/me/**").authenticated()
+                        .requestMatchers("/users/**").hasAuthority("USER_MANAGE")
+                        .requestMatchers("/roles/**").hasAuthority("ROLE_MANAGE")
+                        .requestMatchers("/groups/**").hasAuthority("GROUP_MANAGE")
+                        .requestMatchers("/authorities/**").hasAuthority("AUTHORITY_MANAGE")
                         .anyRequest().authenticated()
                 )
                 .formLogin(Customizer.withDefaults())// Cho phép hiển thị form login
 
                 .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(Customizer.withDefaults())); // Cấu hình để xác thực JWT
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))); // Cấu hình để xác thực JWT
 
         return http.build();
     }
@@ -55,6 +62,16 @@ public class WebSecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         authProvider.setUserDetailsService(userDetailsService);
         return authProvider;
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        converter.setAuthoritiesClaimName("authorities"); // <-- dùng claim "authorities"
+        converter.setAuthorityPrefix(""); // <-- không thêm "SCOPE_"
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
+        return jwtConverter;
     }
 
     @Bean

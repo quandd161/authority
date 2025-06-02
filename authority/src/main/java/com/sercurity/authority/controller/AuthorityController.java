@@ -1,8 +1,11 @@
 package com.sercurity.authority.controller;
 
+import com.sercurity.authority.dto.AuthorityDto;
 import com.sercurity.authority.model.Authority;
 import com.sercurity.authority.repository.AuthorityRepository;
+import com.sercurity.authority.service.AuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,27 +13,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/authorities")
 public class AuthorityController {
-    @Autowired
-    private AuthorityRepository authorityRepo;
+    private final AuthorityService authorityService;
+    public AuthorityController(AuthorityService authorityService) { this.authorityService = authorityService; }
 
+    @PreAuthorize("hasAuthority('AUTHORITY_MANAGE')")
     @GetMapping
-    public List<Authority> list() {
-        return authorityRepo.findAll();
+    public List<AuthorityDto> getAll() {
+        return authorityService.getAll().stream().map(AuthorityDto::fromEntity).toList();
     }
 
+    @PreAuthorize("hasAuthority('AUTHORITY_MANAGE')")
     @PostMapping
-    public Authority create(@RequestBody Authority authority) {
-        return authorityRepo.save(authority);
-    }
-
-    @PutMapping("/{id}")
-    public Authority update(@PathVariable Long id, @RequestBody Authority authority) {
-        authority.setId(id);
-        return authorityRepo.save(authority);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        authorityRepo.deleteById(id);
+    public AuthorityDto create(@RequestBody AuthorityDto dto) {
+        Authority a = new Authority();
+        a.setName(dto.getName());
+        return AuthorityDto.fromEntity(authorityService.create(a));
     }
 }
