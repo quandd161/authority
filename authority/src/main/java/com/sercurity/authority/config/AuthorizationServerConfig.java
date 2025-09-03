@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
@@ -31,6 +32,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Duration;
 import java.util.UUID;
 
 @Configuration
@@ -78,6 +80,10 @@ public class AuthorizationServerConfig {
                 .clientSettings(ClientSettings.builder().build())
                 .scope(OidcScopes.PROFILE)
                 .scope(OidcScopes.OPENID)
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofHours(12)) // 12h
+                        .refreshTokenTimeToLive(Duration.ofDays(30)) // 30 ngày
+                        .build())
                 .redirectUri("http://localhost:3000/oauth2/login/code")
                 .build();
 

@@ -22,9 +22,9 @@ public class RoleDto {
         RoleDto dto = new RoleDto();
         dto.id = role.getId();
         dto.name = role.getName();
-        dto.authorities = role.getAuthorities() != null
-                ? role.getAuthorities().stream().map(a -> a.getName()).collect(Collectors.toSet())
-                : Set.of();
+//        dto.authorities = role.getAuthorities() != null
+//                ? role.getAuthorities().stream().map(a -> a.getName()).collect(Collectors.toSet())
+//                : Set.of();
         return dto;
     }
 

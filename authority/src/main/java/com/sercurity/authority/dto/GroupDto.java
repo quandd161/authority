@@ -22,9 +22,9 @@ public class GroupDto {
         GroupDto dto = new GroupDto();
         dto.id = g.getId();
         dto.name = g.getName();
-        dto.roles = g.getRoles() != null
-                ? g.getRoles().stream().map(r -> r.getName()).collect(Collectors.toSet())
-                : Set.of();
+//        dto.roles = g.getRoles() != null
+//                ? g.getRoles().stream().map(r -> r.getName()).collect(Collectors.toSet())
+//                : Set.of();
         return dto;
     }
 

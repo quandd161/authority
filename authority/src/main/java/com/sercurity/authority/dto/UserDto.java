@@ -28,8 +28,8 @@ public class UserDto {
         dto.username = user.getUsername();
         dto.password = user.getPassword();
         dto.enabled = user.isEnabled();
-        dto.roles = user.getRoles() != null ? user.getRoles().stream().map(r -> r.getName()).collect(Collectors.toSet()) : Set.of();
-        dto.groups = user.getGroups() != null ? user.getGroups().stream().map(g -> g.getName()).collect(Collectors.toSet()) : Set.of();
+//        dto.roles = user.getRoles() != null ? user.getRoles().stream().map(r -> r.getName()).collect(Collectors.toSet()) : Set.of();
+//        dto.groups = user.getGroups() != null ? user.getGroups().stream().map(g -> g.getName()).collect(Collectors.toSet()) : Set.of();
         return dto;
     }
 
